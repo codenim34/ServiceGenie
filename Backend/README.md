@@ -54,11 +54,26 @@ Edit `.env` and add your configuration:
 - Secret key for JWT
 
 4. **Firebase Setup**:
+   - Follow the [Firebase Setup Guide](FIREBASE_SETUP.md) for detailed instructions
    - Download your Firebase Admin SDK JSON file from Firebase Console
    - Save it as `firebase-credentials.json` in the Backend directory
    - Update `FIREBASE_CREDENTIALS_PATH` in `.env`
 
-5. **Run the application**:
+5. **Test Connections**:
+```bash
+# Test MongoDB connection
+python tests/test_db_connection.py
+
+# Test Firebase connection
+python tests/test_firebase_connection.py
+```
+
+6. **Seed Database (Optional)**:
+```bash
+python scripts/seed_db.py
+```
+
+7. **Run the application**:
 ```bash
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
@@ -183,6 +198,34 @@ API Documentation: `http://localhost:8000/docs`
 - MongoDB queries use ObjectId validation
 - Stripe webhook signatures are verified
 
+## Project Structure
+
+```
+Backend/
+├── app/                      # Application code
+│   ├── api/                  # API routes
+│   │   └── v1/              # API version 1
+│   │       ├── api.py       # Router aggregator
+│   │       └── endpoints/   # Individual endpoint modules
+│   ├── core/                # Core functionality
+│   │   ├── config.py        # Settings & configuration
+│   │   ├── database.py      # Database connection
+│   │   ├── firebase.py      # Firebase Admin SDK
+│   │   └── security.py      # Auth & security
+│   └── models/              # Data models (Pydantic)
+├── scripts/                 # Utility scripts
+│   └── seed_db.py          # Database seeding
+├── tests/                   # Test suite
+│   ├── test_api.py         # API endpoint tests
+│   ├── test_db_connection.py  # Database connection test
+│   └── test_firebase_connection.py  # Firebase connection test
+├── main.py                  # Application entry point
+├── requirements.txt         # Python dependencies
+└── .env                     # Environment variables (gitignored)
+```
+
+See [STRUCTURE.md](STRUCTURE.md) for detailed architecture and best practices.
+
 ## Development
 
 ```bash
@@ -196,8 +239,34 @@ uvicorn main:app --port 8080
 uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
+## Documentation
+
+- [Setup Guide](SETUP_GUIDE.md) - Comprehensive setup instructions
+- [Firebase Setup](FIREBASE_SETUP.md) - Firebase configuration guide
+- [Structure Guide](STRUCTURE.md) - Code organization and best practices
+- [API Documentation](http://localhost:8000/docs) - Interactive Swagger UI
+
 ## Testing
 
+### Connection Tests
+```bash
+# Test MongoDB connection
+python tests/test_db_connection.py
+
+# Test Firebase connection
+python tests/test_firebase_connection.py
+```
+
+### Unit Tests
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=app tests/
+```
+
+### API Testing
 Test the API using:
 - Swagger UI: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
