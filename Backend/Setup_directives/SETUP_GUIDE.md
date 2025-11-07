@@ -76,7 +76,7 @@ Access at:
 ## 🔐 Your MongoDB Configuration
 
 ```env
-MONGODB_URL=mongodb+srv://tasnimashraf:serviceGenie34%4012%23@cluster0.lytnrtd.mongodb.net/?appName=Cluster0
+MONGODB_URL=mongodb+srv://tasnimashraf*******@cluster0.lytnrtd.mongodb.net/?appName=Cluster0
 DATABASE_NAME=servicegenie
 ```
 
