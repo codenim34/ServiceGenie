@@ -1,0 +1,136 @@
+"""
+AI agent routes for chat functionality.
+"""
+from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from app.routes.auth_routes import get_current_user, get_optional_user
+from app.schemas.chat_schema import ChatMessageCreate, ChatResponse, ChatHistoryResponse
+from app.services.ai_service import process_chat_message
+from app.core.db import get_database
+from datetime import datetime
+from bson import ObjectId
+
+router = APIRouter(prefix="/agent", tags=["agent"])
+
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat_with_agent(
+    message_data: ChatMessageCreate,
+    current_user: Optional[dict] = Depends(get_optional_user)
+):
+    """
+    Chat with AI agent.
+    
+    Args:
+        message_data: Chat message data
+        current_user: Current authenticated user (optional)
+        
+    Returns:
+        ChatResponse: AI agent response
+    """
+    user_id = current_user["uid"] if current_user else None
+    user_type = "owner" if current_user and message_data.owner_id is None else "customer"
+    owner_id = message_data.owner_id
+    
+    # Process message with AI service
+    response = await process_chat_message(
+        message=message_data.content,
+        owner_id=owner_id,
+        user_type=user_type
+    )
+    
+    # Save chat history if user is authenticated
+    if user_id:
+        db = get_database()
+        chats_collection = db.chats
+        
+        # Find or create chat session
+        chat = await chats_collection.find_one({
+            "user_id": user_id,
+            "owner_id": owner_id or None
+        })
+        
+        if chat:
+            # Update existing chat
+            await chats_collection.update_one(
+                {"_id": chat["_id"]},
+                {
+                    "$push": {
+                        "messages": {
+                            "$each": [
+                                {
+                                    "role": "user",
+                                    "content": message_data.content,
+                                    "timestamp": datetime.utcnow()
+                                },
+                                {
+                                    "role": "assistant",
+                                    "content": response.reply,
+                                    "timestamp": datetime.utcnow()
+                                }
+                            ]
+                        }
+                    },
+                    "$set": {"updated_at": datetime.utcnow()}
+                }
+            )
+        else:
+            # Create new chat
+            chat_dict = {
+                "user_id": user_id,
+                "user_type": user_type,
+                "owner_id": owner_id,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": message_data.content,
+                        "timestamp": datetime.utcnow()
+                    },
+                    {
+                        "role": "assistant",
+                        "content": response.reply,
+                        "timestamp": datetime.utcnow()
+                    }
+                ],
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            await chats_collection.insert_one(chat_dict)
+    
+    return response
+
+
+@router.get("/chat/history", response_model=list)
+async def get_chat_history(
+    owner_id: Optional[str] = None,
+    current_user: Optional[dict] = Depends(get_optional_user)
+):
+    """
+    Get chat history for current user.
+    
+    Args:
+        owner_id: Optional owner ID to filter chats
+        current_user: Current authenticated user
+        
+    Returns:
+        List[dict]: Chat history
+    """
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    db = get_database()
+    chats_collection = db.chats
+    
+    query = {"user_id": current_user["uid"]}
+    if owner_id:
+        query["owner_id"] = owner_id
+    
+    cursor = chats_collection.find(query).sort("updated_at", -1)
+    chats = await cursor.to_list(length=100)
+    
+    for chat in chats:
+        chat["id"] = str(chat["_id"])
+        del chat["_id"]
+    
+    return chats
+

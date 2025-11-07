@@ -1,231 +1,226 @@
-# ServiceGenie - AI-Powered E-Commerce Platform
+# ServiceGenie - AI-Powered Commerce Platform
 
-ServiceGenie is a modern, full-stack e-commerce platform with AI capabilities, built for seamless online shopping experiences.
-
-## 🌟 Features
-
-### For Customers
-- 🛍️ Browse products by categories
-- 🔍 Advanced search and filtering
-- 🛒 Shopping cart management
-- 💳 Secure payment processing (Stripe)
-- 📦 Order tracking
-- 👤 User authentication (Email/Google)
-- 📱 Fully responsive design
-- 🎨 Beautiful royal blue & black theme
-
-### For Admins
-- 📊 Product management (CRUD)
-- 📁 Category management
-- 📦 Order management
-- 👥 User management
-- 💰 Sales analytics (coming soon)
-- 🤖 AI assistant integration (roadmap)
+Full-stack MVP for an AI-powered commerce platform with modular architecture, ready for production extension.
 
 ## 🏗️ Architecture
 
-```
-ServiceGenie/
-├── Frontend/          # Next.js 14 application
-│   ├── src/
-│   │   ├── app/      # App Router pages
-│   │   ├── components/
-│   │   ├── lib/      # Utilities
-│   │   └── types/    # TypeScript types
-│   └── public/
-│
-└── Backend/          # FastAPI application
-    ├── app/
-    │   ├── api/      # API routes
-    │   ├── core/     # Core configs
-    │   └── models/   # Data models
-    └── main.py
-```
-
-## 🚀 Tech Stack
+### Backend
+- **FastAPI** (Python) - RESTful API
+- **MongoDB Atlas** - Database
+- **Firebase Authentication** - User authentication
+- **Cloudinary** - Image storage
 
 ### Frontend
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: TailwindCSS
-- **State**: React Context + Zustand
-- **Auth**: Firebase Authentication
-- **Payments**: Stripe
-- **Icons**: Lucide React
-- **Animations**: Framer Motion
+- **Next.js 14** (App Router) with TypeScript
+- **Firebase Authentication** - Client-side auth
+- **Tailwind CSS** - Styling
+- **Axios** - API client
 
-### Backend
-- **Framework**: FastAPI
-- **Language**: Python 3.9+
-- **Database**: MongoDB
-- **Auth**: Firebase Admin SDK
-- **Payments**: Stripe
-- **Async Driver**: Motor
+## 📁 Project Structure
 
-## 📋 Prerequisites
-
-Before you begin, ensure you have:
-- Node.js 18+ and npm/yarn
-- Python 3.9+
-- MongoDB (local or cloud instance)
-- Firebase project
-- Stripe account
-
-## 🛠️ Installation
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/codenim34/ServiceGenie.git
-cd ServiceGenie
+```
+ServiceGenie/
+├── backend/          # FastAPI backend
+│   ├── app/
+│   │   ├── core/     # Configuration, database, Firebase
+│   │   ├── models/   # Database models
+│   │   ├── schemas/  # Pydantic schemas
+│   │   ├── services/ # Business logic
+│   │   ├── routes/   # API routes
+│   │   ├── utils/    # Utility functions
+│   │   └── main.py   # FastAPI app
+│   └── requirements.txt
+│
+└── frontend/         # Next.js frontend
+    ├── app/          # Next.js pages
+    ├── components/   # React components
+    ├── lib/          # Utilities, API client, types
+    └── package.json
 ```
 
-### 2. Backend Setup
+## 🚀 Quick Start
 
+### Backend Setup
+
+1. Navigate to backend directory:
 ```bash
-cd Backend
+cd backend
+```
 
-# Create virtual environment
+2. Create virtual environment:
+```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-# Install dependencies
+3. Install dependencies:
+```bash
 pip install -r requirements.txt
+```
 
-# Configure environment
+4. Create `.env` file from `.env.example`:
+```bash
 cp .env.example .env
-# Edit .env with your configuration
-
-# Add Firebase credentials
-# Download firebase-credentials.json from Firebase Console
-# Place it in Backend directory
-
-# Seed database with sample data
-python scripts/seed_db.py
-
-# Run the server
-uvicorn main:app --reload --port 8000
 ```
 
-Backend will run on: `http://localhost:8000`
+5. Update `.env` with your credentials:
+   - MongoDB Atlas connection string
+   - Firebase credentials path
+   - Cloudinary credentials (optional)
 
-API Docs: `http://localhost:8000/docs`
+6. Download Firebase Admin SDK credentials JSON file and place in backend directory.
 
-### 3. Frontend Setup
-
+7. Run the server:
 ```bash
-cd Frontend
+uvicorn app.main:app --reload
+```
 
-# Install dependencies
+Backend will be available at `http://localhost:8000`
+API docs at `http://localhost:8000/docs`
+
+### Frontend Setup
+
+1. Navigate to frontend directory:
+```bash
+cd frontend
+```
+
+2. Install dependencies:
+```bash
 npm install
-# or
-yarn install
+```
 
-# Configure environment
-cp .env.example .env.local
-# Edit .env.local with your configuration
+3. Create `.env.local` file from `.env.local.example`:
+```bash
+cp .env.local.example .env.local
+```
 
-# Run development server
+4. Update `.env.local` with your Firebase configuration and backend URL.
+
+5. Run the development server:
+```bash
 npm run dev
-# or
-yarn dev
 ```
 
-Frontend will run on: `http://localhost:3000`
+Frontend will be available at `http://localhost:3000`
 
-## 🔐 Environment Configuration
+## ✨ Features
 
-### Backend (.env)
-```env
-MONGODB_URL=mongodb://localhost:27017
+### For Business Owners
+- ✅ Sign up/Login with Firebase Auth
+- ✅ Upload product information (name, price, image, category)
+- ✅ Manage products (create, read, update, delete)
+- ✅ View orders and analytics
+- ✅ Chat with AI agent
+
+### For Customers
+- ✅ Browse products
+- ✅ View product details
+- ✅ Place orders
+- ✅ Chat with AI agent for product recommendations
+
+### AI Agent
+- ✅ Stub implementation ready for OpenAI/Gemini integration
+- ✅ Chat interface for both owners and customers
+- ✅ Product recommendations based on queries
+
+## 🔑 Environment Variables
+
+### Backend (`.env`)
+```
+MONGO_URI=mongodb+srv://...
 DATABASE_NAME=servicegenie
-FIREBASE_CREDENTIALS_PATH=./firebase-credentials.json
-SECRET_KEY=your-secret-key-change-this
-ALLOWED_ORIGINS=http://localhost:3000
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_CREDENTIAL_PATH=./firebase-credentials.json
+CLOUDINARY_API_KEY=your-key (optional)
+CLOUDINARY_API_SECRET=your-secret (optional)
+CLOUDINARY_CLOUD_NAME=your-cloud-name (optional)
+OPENAI_API_KEY=your-key (optional, for future AI integration)
 ```
 
-### Frontend (.env.local)
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000/api
-NEXT_PUBLIC_FIREBASE_API_KEY=...
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
-NEXT_PUBLIC_FIREBASE_APP_ID=...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+### Frontend (`.env.local`)
+```
+NEXT_PUBLIC_FIREBASE_API_KEY=your-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
 ```
 
-## 🎨 Theme
+## 📡 API Endpoints
 
-ServiceGenie uses a royal blue and black gradient theme:
-- **Primary**: Royal Blue (#0047e6)
-- **Dark Tones**: Pure Black to Dark Blue
-- **Accents**: Gradient overlays with glass morphism
-- **Effects**: Shimmer animations, backdrop blur
+### Authentication
+- `POST /api/v1/auth/verify` - Verify Firebase token
+- `GET /api/v1/auth/user/{uid}` - Get user by UID
 
-## 📱 Quick Start Guide
+### Products
+- `GET /api/v1/products` - Get all products
+- `GET /api/v1/products/{product_id}` - Get product by ID
+- `POST /api/v1/products` - Create product (requires auth)
+- `PUT /api/v1/products/{product_id}` - Update product (requires auth)
+- `DELETE /api/v1/products/{product_id}` - Delete product (requires auth)
 
-1. **Start MongoDB**: Make sure MongoDB is running
-2. **Start Backend**: `cd Backend && uvicorn main:app --reload`
-3. **Seed Database**: `python scripts/seed_db.py` (optional)
-4. **Start Frontend**: `cd Frontend && npm run dev`
-5. **Access Application**: Open `http://localhost:3000`
+### Orders
+- `GET /api/v1/orders` - Get orders (requires auth)
+- `GET /api/v1/orders/{order_id}` - Get order by ID
+- `POST /api/v1/orders` - Create order
 
-## 🔌 API Documentation
+### Owners
+- `GET /api/v1/owners/me` - Get owner profile (requires auth)
+- `POST /api/v1/owners` - Create/update owner profile (requires auth)
+- `PUT /api/v1/owners/me` - Update owner profile (requires auth)
+- `GET /api/v1/owners/me/analytics` - Get owner analytics (requires auth)
 
-Full API documentation available at `http://localhost:8000/docs` when backend is running.
+### AI Agent
+- `POST /api/v1/agent/chat` - Chat with AI agent
+- `GET /api/v1/agent/chat/history` - Get chat history (requires auth)
 
-Key endpoints:
-- `/api/products` - Product management
-- `/api/categories` - Category management
-- `/api/orders` - Order management
-- `/api/users` - User management
-- `/api/payment` - Payment processing
+## 🔧 Development
 
-## 📦 Deployment
+### Backend
+- Add new models in `backend/app/models/`
+- Add new schemas in `backend/app/schemas/`
+- Add business logic in `backend/app/services/`
+- Add new routes in `backend/app/routes/`
 
-### Backend (Production)
-```bash
-# Using Gunicorn + Uvicorn
-gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
-```
+### Frontend
+- Add new pages in `frontend/app/`
+- Add new components in `frontend/components/`
+- Update API client in `frontend/lib/api.ts`
+- Update types in `frontend/lib/types.ts`
 
-### Frontend (Vercel)
-```bash
-# Build
-npm run build
+## 🧠 AI Agent Integration
 
-# Or deploy to Vercel
-vercel deploy --prod
-```
+The AI agent service (`backend/app/services/ai_service.py`) is currently a stub implementation. To integrate with OpenAI or Gemini:
 
-## 🔮 Roadmap
+1. Install the respective SDK (e.g., `openai`)
+2. Update `process_chat_message` function in `ai_service.py`
+3. Add API key to backend `.env`
 
-- [x] Core e-commerce functionality
-- [x] Firebase authentication
-- [x] Stripe payment integration
-- [x] Product management
-- [x] Order management
-- [x] Royal blue theme
-- [ ] AI chatbot assistant
-- [ ] Advanced analytics dashboard
-- [ ] Multi-language support (Bangla, Banglish)
-- [ ] Image-based product search
-- [ ] Recommendation engine
-- [ ] Email notifications
-- [ ] Review and rating system
-- [ ] Wishlist functionality
+Example OpenAI integration is commented in the service file.
+
+## 📝 Notes
+
+- MongoDB collections are created automatically on first use
+- Firebase Authentication handles user management
+- Cloudinary is optional - image uploads will fail gracefully if not configured
+- AI agent responses are currently keyword-based stubs
+- All endpoints return JSON responses
+- CORS is configured for localhost development
+
+## 🚢 Production Deployment
+
+1. Update CORS origins in `backend/app/core/config.py`
+2. Set proper `SECRET_KEY` in backend `.env`
+3. Configure production MongoDB Atlas cluster
+4. Set up Firebase production project
+5. Configure Cloudinary production account
+6. Deploy backend to cloud (e.g., Railway, Render, AWS)
+7. Deploy frontend to Vercel or similar
+8. Update frontend `.env.local` with production backend URL
 
 ## 📄 License
 
-Proprietary - ServiceGenie © 2025
-
-## 👥 Team
-
-- **Codenim34** - [GitHub](https://github.com/codenim34)
-
----
-
-**Made with ❤️ for seamless e-commerce experiences**
+MIT

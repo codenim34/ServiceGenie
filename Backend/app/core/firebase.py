@@ -4,11 +4,12 @@ Firebase Admin SDK initialization and authentication utilities.
 import firebase_admin
 from firebase_admin import credentials, auth
 from pathlib import Path
-from .config import settings
+from app.core.config import settings
+from typing import Optional, Dict
 
 
 # Global variable to track if Firebase is initialized
-_firebase_app = None
+_firebase_app: Optional[firebase_admin.App] = None
 
 
 def initialize_firebase():
@@ -31,12 +32,12 @@ def initialize_firebase():
         pass
     
     # Get credentials file path
-    creds_path = Path(settings.FIREBASE_CREDENTIALS_PATH)
+    creds_path = Path(settings.FIREBASE_CREDENTIAL_PATH)
     
     if not creds_path.exists():
         raise FileNotFoundError(
             f"Firebase credentials file not found at: {creds_path}\n"
-            f"Please download it from Firebase Console and update FIREBASE_CREDENTIALS_PATH in .env"
+            f"Please download it from Firebase Console and update FIREBASE_CREDENTIAL_PATH in .env"
         )
     
     # Initialize Firebase Admin SDK
@@ -46,7 +47,7 @@ def initialize_firebase():
     return _firebase_app
 
 
-def verify_firebase_token(token: str) -> dict:
+def verify_firebase_token(token: str) -> Dict:
     """
     Verify a Firebase ID token.
     
@@ -57,8 +58,7 @@ def verify_firebase_token(token: str) -> dict:
         dict: Decoded token containing user information
         
     Raises:
-        auth.InvalidIdTokenError: If the token is invalid
-        auth.ExpiredIdTokenError: If the token has expired
+        Exception: If the token is invalid or expired
     """
     # Ensure Firebase is initialized
     initialize_firebase()
@@ -91,70 +91,3 @@ def get_user_by_uid(uid: str):
         raise ValueError(f"User not found with UID: {uid}")
     except Exception as e:
         raise Exception(f"Error fetching user: {str(e)}")
-
-
-def create_custom_token(uid: str, additional_claims: dict = None) -> bytes:
-    """
-    Create a custom token for a user.
-    
-    Args:
-        uid: Firebase user UID
-        additional_claims: Optional additional claims to include in the token
-        
-    Returns:
-        bytes: Custom token
-    """
-    # Ensure Firebase is initialized
-    initialize_firebase()
-    
-    try:
-        custom_token = auth.create_custom_token(uid, additional_claims)
-        return custom_token
-    except Exception as e:
-        raise Exception(f"Error creating custom token: {str(e)}")
-
-
-def delete_user(uid: str):
-    """
-    Delete a user by UID.
-    
-    Args:
-        uid: Firebase user UID
-    """
-    # Ensure Firebase is initialized
-    initialize_firebase()
-    
-    try:
-        auth.delete_user(uid)
-    except auth.UserNotFoundError:
-        raise ValueError(f"User not found with UID: {uid}")
-    except Exception as e:
-        raise Exception(f"Error deleting user: {str(e)}")
-
-
-def list_users(max_results: int = 1000):
-    """
-    List all users.
-    
-    Args:
-        max_results: Maximum number of users to return
-        
-    Returns:
-        ListUsersPage: Page of users
-    """
-    # Ensure Firebase is initialized
-    initialize_firebase()
-    
-    try:
-        page = auth.list_users(max_results=max_results)
-        return page
-    except Exception as e:
-        raise Exception(f"Error listing users: {str(e)}")
-
-
-# Initialize Firebase when module is imported
-try:
-    initialize_firebase()
-except Exception as e:
-    print(f"Warning: Firebase initialization failed: {e}")
-    print("Firebase will be initialized on first use.")
