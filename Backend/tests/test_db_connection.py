@@ -4,6 +4,8 @@ Run this to verify your MongoDB Atlas connection is working.
 """
 
 import asyncio
+import os
+import pytest
 from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime
 import sys
@@ -114,5 +116,10 @@ async def test_mongodb_connection():
         return False
 
 if __name__ == "__main__":
+    # Allow running standalone, but pytest should skip this module by default.
     success = asyncio.run(test_mongodb_connection())
     sys.exit(0 if success else 1)
+
+# Skip heavy integration test unless explicitly enabled
+if not os.environ.get("RUN_INTEGRATION"):
+    pytest.skip("Skipping MongoDB integration test (set RUN_INTEGRATION=1 to enable)", allow_module_level=True)

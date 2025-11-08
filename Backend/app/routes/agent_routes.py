@@ -103,13 +103,17 @@ async def chat_with_agent(
 @router.get("/chat/history", response_model=list)
 async def get_chat_history(
     owner_id: Optional[str] = None,
+    cursor: Optional[str] = None,
+    limit: int = 20,
     current_user: Optional[dict] = Depends(get_optional_user)
 ):
     """
-    Get chat history for current user.
+    Get chat history for current user with cursor-based pagination.
     
     Args:
         owner_id: Optional owner ID to filter chats
+        cursor: Cursor for pagination (timestamp of last message)
+        limit: Number of messages to return
         current_user: Current authenticated user
         
     Returns:
@@ -121,16 +125,34 @@ async def get_chat_history(
     db = get_database()
     chats_collection = db.chats
     
+    # Build query
     query = {"user_id": current_user["uid"]}
     if owner_id:
         query["owner_id"] = owner_id
+    if cursor:
+        query["updated_at"] = {"$lt": datetime.fromisoformat(cursor)}
     
-    cursor = chats_collection.find(query).sort("updated_at", -1)
-    chats = await cursor.to_list(length=100)
+    # Get paginated results with lean projection
+    cursor = chats_collection.find(
+        query,
+        projection={
+            "messages": {"$slice": -limit},  # Get only recent messages
+            "user_id": 1,
+            "owner_id": 1,
+            "updated_at": 1
+        }
+    ).sort("updated_at", -1).limit(limit)
     
+    chats = await cursor.to_list(length=limit)
+    
+    # Transform for response
     for chat in chats:
         chat["id"] = str(chat["_id"])
         del chat["_id"]
+        
+        # Add cursor for next page if there are more messages
+        if len(chats) == limit:
+            chat["next_cursor"] = chat["updated_at"].isoformat()
     
     return chats
 

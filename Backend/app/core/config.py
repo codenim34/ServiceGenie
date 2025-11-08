@@ -24,9 +24,14 @@ class Settings(BaseSettings):
     # OpenAI (for AI agent)
     OPENAI_API_KEY: Optional[str] = None
     
+    # Stripe
+    STRIPE_SECRET_KEY: Optional[str] = None
+    STRIPE_PUBLISHABLE_KEY: Optional[str] = None
+    
     # API
     API_V1_PREFIX: str = "/api/v1"
     SECRET_KEY: str = "dev-secret-key-change-in-production"
+    STOREFRONT_BASE_URL: Optional[str] = None
     
     # CORS
     ALLOWED_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:3001"]

@@ -16,7 +16,25 @@ export default function ChatBox({ ownerId, onProductClick }: ChatBoxProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Load chat history on mount
+  useEffect(() => {
+    const loadChatHistory = async () => {
+      try {
+        const history = await api.getChatHistory(ownerId);
+        if (history?.[0]?.messages) {
+          setMessages(history[0].messages);
+        }
+      } catch (error) {
+        console.error('Error loading chat history:', error);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    loadChatHistory();
+  }, [ownerId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -26,13 +44,26 @@ export default function ChatBox({ ownerId, onProductClick }: ChatBoxProps) {
     scrollToBottom();
   }, [messages]);
 
+  // Send chat request (no lodash debounce here because lodash.debounce
+  // does not return a promise that can be awaited).
+  const sendChatRequest = async (message: string) => {
+    try {
+      const response: ChatResponse = await api.chatWithAgent(message, ownerId);
+      return response;
+    } catch (error) {
+      console.error('Error sending message:', error);
+      throw error;
+    }
+  };
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
+    const messageText = input.trim();
     const userMessage: ChatMessage = {
       role: 'user',
-      content: input,
+      content: messageText,
       timestamp: new Date().toISOString(),
     };
 
@@ -41,11 +72,12 @@ export default function ChatBox({ ownerId, onProductClick }: ChatBoxProps) {
     setLoading(true);
 
     try {
-      const response: ChatResponse = await api.chatWithAgent(input, ownerId);
-      
+      // Use direct API call for now
+      const response = await sendChatRequest(messageText);
+
       const assistantMessage: ChatMessage = {
         role: 'assistant',
-        content: response.reply,
+        content: response?.reply ?? 'Sorry, no reply received from the assistant.',
         timestamp: new Date().toISOString(),
       };
 
@@ -70,7 +102,14 @@ export default function ChatBox({ ownerId, onProductClick }: ChatBoxProps) {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 && (
+        {initialLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="animate-pulse flex flex-col items-center space-y-2">
+              <div className="w-12 h-12 rounded-full bg-blue-200"></div>
+              <div className="text-gray-500">Loading chat history...</div>
+            </div>
+          </div>
+        ) : messages.length === 0 && (
           <div className="text-center text-gray-500 mt-8">
             Start a conversation with our AI assistant!
           </div>

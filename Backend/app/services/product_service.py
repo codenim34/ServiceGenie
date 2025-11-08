@@ -1,10 +1,10 @@
-"""
-Product service for business logic.
-"""
+"""Product service for business logic."""
+from datetime import datetime
 from typing import List, Optional
+
 from bson import ObjectId
+
 from app.core.db import get_database
-from app.models.product_model import ProductModel
 from app.schemas.product_schema import ProductCreate, ProductUpdate
 
 
@@ -24,6 +24,9 @@ async def create_product(owner_id: str, product_data: ProductCreate) -> dict:
     
     product_dict = product_data.model_dump()
     product_dict["owner_id"] = owner_id
+    now = datetime.utcnow()
+    product_dict.setdefault("created_at", now)
+    product_dict["updated_at"] = now
     
     result = await products_collection.insert_one(product_dict)
     product = await products_collection.find_one({"_id": result.inserted_id})
@@ -127,7 +130,7 @@ async def update_product(product_id: str, owner_id: str, product_data: ProductUp
         return None
     
     update_data = product_data.model_dump(exclude_unset=True)
-    update_data["updated_at"] = product_data.model_dump().get("updated_at")
+    update_data["updated_at"] = datetime.utcnow()
     
     await products_collection.update_one(
         {"_id": ObjectId(product_id)},
