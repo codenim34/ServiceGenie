@@ -5,6 +5,7 @@ Tests Firebase Admin SDK initialization and authentication.
 
 import sys
 import os
+import pytest
 from pathlib import Path
 
 # Add parent directory to path
@@ -181,6 +182,10 @@ async def test_create_custom_token():
         print_error(f"Failed to create custom token: {e}")
         return False
 
+
+# Skip this module by default (integration tests). Set RUN_INTEGRATION=1 to enable.
+if not os.environ.get("RUN_INTEGRATION"):
+    pytest.skip("Skipping Firebase integration tests (set RUN_INTEGRATION=1 to enable)", allow_module_level=True)
 
 if __name__ == "__main__":
     print("\n")

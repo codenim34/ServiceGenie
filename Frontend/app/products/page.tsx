@@ -54,6 +54,21 @@ export default function ProductsPage() {
             updateData[key] = value;
           }
         });
+
+        if (updateData.quantity !== undefined) {
+          updateData.stock = Number(updateData.quantity);
+          delete updateData.quantity;
+        }
+        if (updateData.stock !== undefined) {
+          updateData.stock = Number(updateData.stock);
+        }
+        if (updateData.price !== undefined) {
+          updateData.price = parseFloat(updateData.price);
+        }
+        if (updateData.is_available !== undefined) {
+          updateData.is_available = updateData.is_available === 'true';
+        }
+
         await api.updateProduct(editingProduct.id, updateData);
         toast.success('Product updated successfully');
       } else {

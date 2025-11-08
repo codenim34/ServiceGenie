@@ -27,6 +27,9 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
       )}
       <div className="p-4">
         <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
+        {product.sku && (
+          <p className="text-xs uppercase tracking-wide text-gray-400 mb-1">SKU: {product.sku}</p>
+        )}
         {product.description && (
           <p className="text-gray-600 text-sm mb-2 line-clamp-2">
             {product.description}
@@ -40,11 +43,18 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
             {product.category}
           </span>
         </div>
-        {product.stock > 0 ? (
-          <p className="text-sm text-green-600 mt-2">In Stock: {product.stock}</p>
-        ) : (
-          <p className="text-sm text-red-600 mt-2">Out of Stock</p>
-        )}
+        <div className="mt-2 space-y-1 text-sm">
+          <p className={product.stock > 0 ? 'text-green-600' : 'text-red-600'}>
+            {product.stock > 0 ? `Quantity Available: ${product.stock}` : 'Out of Stock'}
+          </p>
+          {(product.color || product.size) && (
+            <p className="text-gray-500">
+              {product.color && <span>Color: {product.color}</span>}
+              {product.color && product.size && <span className="mx-2">•</span>}
+              {product.size && <span>Size: {product.size}</span>}
+            </p>
+          )}
+        </div>
         {onAddToCart && product.is_available && product.stock > 0 && (
           <button
             onClick={() => onAddToCart(product)}

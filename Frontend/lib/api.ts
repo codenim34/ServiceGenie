@@ -5,11 +5,13 @@ import axios, { AxiosInstance } from 'axios';
 import { auth } from './firebase';
 import { User } from 'firebase/auth';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+// Use NEXT_PUBLIC_API_URL if present (points to full /api base for prototype)
+// Backend exposes v1 API under /api/v1, ensure client points there by default.
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api/v1';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
-  baseURL: `${API_BASE_URL}/api/v1`,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -114,6 +116,15 @@ export const api = {
     return response.data;
   },
 
+  completeBusinessOnboarding: async (formData: FormData) => {
+    const response = await apiClient.post('/owners/onboarding', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
   getOwnerProfile: async () => {
     const response = await apiClient.get('/owners/me');
     return response.data;
@@ -126,6 +137,11 @@ export const api = {
 
   getOwnerAnalytics: async () => {
     const response = await apiClient.get('/owners/me/analytics');
+    return response.data;
+  },
+
+  getStorefront: async (slug: string) => {
+    const response = await apiClient.get(`/storefronts/${slug}`);
     return response.data;
   },
 

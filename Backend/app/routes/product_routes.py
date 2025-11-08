@@ -22,10 +22,14 @@ router = APIRouter(prefix="/products", tags=["products"])
 @router.post("", response_model=dict, status_code=201)
 async def create_product_endpoint(
     name: str = Form(...),
+    sku: Optional[str] = Form(None),
     description: Optional[str] = Form(None),
     price: float = Form(...),
     category: str = Form(...),
     stock: int = Form(0),
+    quantity: Optional[int] = Form(None),
+    color: Optional[str] = Form(None),
+    size: Optional[str] = Form(None),
     is_available: bool = Form(True),
     image: Optional[UploadFile] = File(None),
     current_user: dict = Depends(get_current_user)
@@ -54,12 +58,17 @@ async def create_product_endpoint(
         image_bytes = await image.read()
         image_url = await upload_image_from_bytes(image_bytes, image.filename or "product.jpg")
     
+    resolved_stock = quantity if quantity is not None else stock
+
     product_data = ProductCreate(
         name=name,
+        sku=sku,
         description=description,
         price=price,
         category=category,
-        stock=stock,
+        color=color,
+        size=size,
+        stock=resolved_stock,
         is_available=is_available,
         image_url=image_url
     )

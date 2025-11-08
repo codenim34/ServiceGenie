@@ -14,10 +14,13 @@ interface ProductFormProps {
 
 export default function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
   const [name, setName] = useState(product?.name || '');
+  const [sku, setSku] = useState(product?.sku || '');
   const [description, setDescription] = useState(product?.description || '');
-  const [price, setPrice] = useState(product?.price.toString() || '');
+  const [price, setPrice] = useState(product ? product.price.toString() : '');
   const [category, setCategory] = useState(product?.category || '');
-  const [stock, setStock] = useState(product?.stock.toString() || '0');
+  const [color, setColor] = useState(product?.color || '');
+  const [size, setSize] = useState(product?.size || '');
+  const [quantity, setQuantity] = useState(product ? product.stock.toString() : '0');
   const [isAvailable, setIsAvailable] = useState(product?.is_available ?? true);
   const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -29,10 +32,14 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
     try {
       const formData = new FormData();
       formData.append('name', name);
+      formData.append('sku', sku);
       formData.append('description', description);
       formData.append('price', price);
       formData.append('category', category);
-      formData.append('stock', stock);
+      formData.append('color', color);
+      formData.append('size', size);
+      formData.append('quantity', quantity);
+      formData.append('stock', quantity);
       formData.append('is_available', isAvailable.toString());
       if (image) {
         formData.append('image', image);
@@ -71,6 +78,17 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
 
       <div className="grid grid-cols-2 gap-4">
         <div>
+          <label className="block text-sm font-medium mb-1">Product ID (SKU)</label>
+          <input
+            type="text"
+            value={sku}
+            onChange={(e) => setSku(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md"
+            placeholder="Optional SKU"
+          />
+        </div>
+
+        <div>
           <label className="block text-sm font-medium mb-1">Price</label>
           <input
             type="number"
@@ -97,11 +115,11 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Stock</label>
+          <label className="block text-sm font-medium mb-1">Quantity</label>
           <input
             type="number"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
             required
             min="0"
             className="w-full px-3 py-2 border rounded-md"
@@ -118,6 +136,30 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
             <option value="available">Available</option>
             <option value="unavailable">Unavailable</option>
           </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-1">Color</label>
+          <input
+            type="text"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md"
+            placeholder="e.g. Blue"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Size</label>
+          <input
+            type="text"
+            value={size}
+            onChange={(e) => setSize(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md"
+            placeholder="e.g. Medium"
+          />
         </div>
       </div>
 

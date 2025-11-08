@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../../lib/firebase';
+import { api } from '../../../lib/api';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -34,9 +35,14 @@ export default function RegisterPage() {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      router.push('/dashboard');
+      await api.createOwner({ email });
+      router.push('/onboarding');
     } catch (error: any) {
-      setError(error.message || 'Failed to create account');
+      const message =
+        error?.response?.data?.detail ||
+        error?.message ||
+        'Failed to create account';
+      setError(message);
     } finally {
       setLoading(false);
     }

@@ -9,9 +9,12 @@ from pydantic import BaseModel, Field
 class ProductBase(BaseModel):
     """Base product schema."""
     name: str
+    sku: Optional[str] = None
     description: Optional[str] = None
     price: float = Field(..., gt=0)
     category: str
+    color: Optional[str] = None
+    size: Optional[str] = None
     stock: int = Field(default=0, ge=0)
     is_available: bool = Field(default=True)
 
@@ -24,10 +27,13 @@ class ProductCreate(ProductBase):
 class ProductUpdate(BaseModel):
     """Schema for updating a product."""
     name: Optional[str] = None
+    sku: Optional[str] = None
     description: Optional[str] = None
     price: Optional[float] = Field(None, gt=0)
     category: Optional[str] = None
     image_url: Optional[str] = None
+    color: Optional[str] = None
+    size: Optional[str] = None
     stock: Optional[int] = Field(None, ge=0)
     is_available: Optional[bool] = None
 
